@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bands">
+<meta name="theme-color" content="#14171c">
+<title>Bands</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2314171c'/%3E%3Cpath d='M40 90 Q90 40 140 90 Q90 140 40 90Z' fill='none' stroke='%23f0a030' stroke-width='14'/%3E%3Ccircle cx='40' cy='90' r='14' fill='%233fb7a3'/%3E%3Ccircle cx='140' cy='90' r='14' fill='%233fb7a3'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<style>
+:root{--bg:#14171c;--card:#1e232b;--card2:#272d37;--line:#343b47;--text:#eef1f5;--dim:#9aa4b2;--acc:#f0a030;--ok:#3fb7a3;--bad:#e5534b;--r:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 80px)}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+header h1{font-size:20px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{padding:14px;max-width:640px;margin:0 auto}
+button,.btn{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;min-height:46px;padding:0 16px;cursor:pointer}
+button:active{opacity:.7}
+.pri{background:var(--acc);color:#111;border-color:var(--acc);font-weight:600}
+.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+.sm{min-height:36px;padding:0 10px;font-size:15px;border-radius:10px}
+.full{width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.day{display:block;width:100%;text-align:left;padding:16px;min-height:80px}
+.day.today{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.day .t{font-size:20px;font-weight:600}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--acc);color:#111;margin-left:6px;vertical-align:middle}
+.dim{color:var(--dim)}.small{font-size:14px}.tiny{font-size:12px}
+.ex h3{margin:0 0 4px;font-size:18px}
+.cue{margin:0 0 4px;font-size:15px}
+.safety{font-size:14px;color:#ffd08a;background:#3a2c15;border-radius:8px;padding:6px 8px;margin:6px 0}
+.setrow{display:grid;grid-template-columns:28px 1fr 74px 48px;gap:6px;align-items:center;margin-top:8px}
+.setrow .n{color:var(--dim);text-align:center;font-weight:600}
+input,textarea,select{font:inherit;font-size:17px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;min-height:44px;padding:8px 10px;width:100%}
+input::placeholder,textarea::placeholder{color:#6d7684}
+input:focus,textarea:focus{outline:2px solid var(--acc);border-color:transparent}
+.chk{width:48px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:22px;padding:0;color:#4a5260}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#111}
+.setrow.done input{opacity:.65}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0 34px}
+.chip{min-height:34px;padding:0 10px;font-size:14px;border-radius:99px}
+.note{margin:6px 0 0 34px;width:calc(100% - 34px);min-height:38px;font-size:15px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>.grow{flex:1}
+.timer{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#0e1014;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center}
+.timer .clock{font-size:26px;font-variant-numeric:tabular-nums;font-weight:700;min-width:70px}
+.timer.run .clock{color:var(--acc)}.timer.end .clock{color:var(--ok)}
+.timer button{flex:1;padding:0 6px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:#0e1014;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;border-radius:0;background:transparent;min-height:58px;color:var(--dim)}
+nav.tabs button.on{color:var(--acc);font-weight:600}
+.list button{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px 14px;min-height:60px}
+.seg{display:flex;gap:6px;margin-bottom:12px}.seg button{flex:1}.seg button.on{background:var(--acc);color:#111;border-color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--dim);font-weight:500}
+.prog{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.prog span{background:var(--card2);border-radius:8px;padding:4px 8px;font-size:13px}
+.prog span b{color:var(--acc);font-weight:600}
+label.f{display:block;font-size:14px;color:var(--dim);margin:10px 0 4px}
+h2{font-size:17px;margin:18px 0 8px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);transform:translateX(-50%);background:var(--ok);color:#111;padding:10px 16px;border-radius:10px;font-weight:600;z-index:20}
+</style>
+</head>
+<body>
+<header><button id="backBtn" class="ghost sm" style="display:none">‹ Back</button><h1 id="title">Bands</h1><span id="hdrRight"></span></header>
+<main id="app"></main>
+<div id="bottom"></div>
+<script>
+'use strict';
+const BACK='Back: brace your core, keep a neutral spine, and stop if pain is sharp or runs down the leg.';
+const DEFAULT_PROGRAM={days:[
+ {id:'torsoA',name:'Torso A',focus:'Push',weekday:1,exercises:[
+  {id:'ta1',name:'Band incline chest press',cue:'Anchor low behind you; press up and forward at about 30°.',replaces:'Smith incline bench'},
+  {id:'ta2',name:'Band lat pulldown',cue:'Anchor high, kneel facing it; pull elbows down to your ribs.',replaces:'Lat pulldown'},
+  {id:'ta3',name:'Band-resisted push-up',cue:'Band across upper back, ends pinned under your hands.',replaces:'Dips'},
+  {id:'ta4',name:'Band wide-grip seated row',cue:'Anchor at chest height or band around feet; pull with elbows flared.',replaces:'Wide cable row'},
+  {id:'ta5',name:'Band chest fly',cue:'Anchor mid-height behind you; hug-a-tree arc, slight elbow bend.',replaces:'Pec deck'},
+  {id:'ta6',name:'Band lateral raise',cue:'Stand on band; raise arms out to shoulder height.',replaces:'Lateral raises'}]},
+ {id:'limbsA',name:'Limbs A',focus:'Legs',weekday:2,exercises:[
+  {id:'la1',name:'Band seated calf raise',cue:'Seated, band looped around ball of foot; point toes into it.',replaces:'Seated calf raise'},
+  {id:'la2',name:'Band leg extension',cue:'Anchor low behind chair, band around ankle; straighten the knee.',replaces:'Leg extension'},
+  {id:'la3',name:'Band front squat',cue:'Stand on band, handles at shoulders; sit straight down, chest up.',replaces:'Hack squat'},
+  {id:'la4',name:'Band hip thrust / glute bridge',cue:'Band across hips, held down by hands or anchored; drive hips up, squeeze glutes.',replaces:'Hip thrust',safety:'Back: lift with the glutes, ribs down, do not arch the low back at the top.'},
+  {id:'la5',name:'Band single-arm tricep pushdown',cue:'Anchor high; elbow pinned at side, push down to straight arm.',replaces:'Single-arm pushdown'},
+  {id:'la6',name:'Band biceps curl',cue:'Stand on band; elbows at sides, curl up.',replaces:'DB curl'}]},
+ {id:'torsoB',name:'Torso B',focus:'Pull',weekday:4,exercises:[
+  {id:'tb1',name:'Band bent-over row',cue:'Stand on band, flat back; hinge only as far as comfortable, row to belly.',replaces:'Barbell row',safety:BACK},
+  {id:'tb2',name:'Band overhead press',cue:'Stand on band; press handles straight overhead.',replaces:'Shoulder press'},
+  {id:'tb3',name:'Band single-arm row',cue:'Anchor mid-height or stand on band; row one arm, elbow to hip.',replaces:'DB row'},
+  {id:'tb4',name:'Band chest press',cue:'Anchor mid-height behind you, standing; press straight forward.',replaces:'DB bench'},
+  {id:'tb5',name:'Band upright row',cue:'Stand on band; elbows up to shoulder height. Stop if shoulders pinch.',replaces:'Upright row'},
+  {id:'tb6',name:'Band deadlift',cue:'Stand on band; hips back, neutral spine, stand tall. Go light while back is sore.',replaces:'Rack pull',safety:BACK}]},
+ {id:'limbsB',name:'Limbs B',focus:'Arms',weekday:5,exercises:[
+  {id:'lb1',name:'Band standing calf raise',cue:'Stand on band, handles at sides; rise high on toes.',replaces:'Standing calf raise'},
+  {id:'lb2',name:'Band close-grip chest press',cue:'Anchor behind; hands close, elbows tucked.',replaces:'Close-grip bench'},
+  {id:'lb3',name:'Band drag curl',cue:'Stand on band; drag hands up your body, elbows back.',replaces:'Drag curl'},
+  {id:'lb4',name:'Band overhead tricep extension',cue:'Stand on band or anchor low, face away; extend arms overhead.',replaces:'Overhead cable extension'},
+  {id:'lb5',name:'Band single-arm concentration curl',cue:'Seated, stand on band, elbow braced on inner thigh; curl.',replaces:'Single-arm preacher curl'},
+  {id:'lb6',name:'Band split squat',cue:'Front foot on band; rear foot elevated if comfortable. Drop straight down.',replaces:'Bulgarian split squat'},
+  {id:'lb7',name:'Band Romanian deadlift',cue:'Stand on band, soft knees; push hips back, neutral spine. Light while back is sore.',replaces:'RDL',safety:BACK}]}
+]};
+const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const BANDS=['Light','Med','Heavy','X-Heavy'];
+const K={prog:'bt_program',sess:'bt_sessions',draft:'bt_draft'};
+
+// ---------- storage ----------
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Could not save: storage full or blocked')}}
+const clone=o=>JSON.parse(JSON.stringify(o));
+let program=load(K.prog,null)||clone(DEFAULT_PROGRAM);
+let sessions=load(K.sess,[]);
+let draft=load(K.draft,null);
+const saveProgram=()=>save(K.prog,program);
+const saveSessions=()=>save(K.sess,sessions);
+const saveDraft=()=>draft?save(K.draft,draft):localStorage.removeItem(K.draft);
+
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function localDate(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmtDate(s){const [y,m,d]=s.split('-').map(Number);const dt=new Date(y,m-1,d);return WD[dt.getDay()]+' '+dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:(y===new Date().getFullYear()?undefined:'numeric')})}
+function daysAgo(s){const [y,m,d]=s.split('-').map(Number);const a=new Date(y,m-1,d),b=new Date();b.setHours(0,0,0,0);const n=Math.round((b-a)/864e5);return n===0?'today':n===1?'yesterday':n+' days ago'}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+const dayById=id=>program.days.find(d=>d.id===id);
+const sortedSessions=()=>sessions.slice().sort((a,b)=>(b.date+b.savedAt).localeCompare(a.date+a.savedAt));
+function bandScore(b){if(!b)return 0;let s=0;String(b).toLowerCase().split(/[+&,\/]| and /).forEach(p=>{p=p.trim().replace(/\s+/g,'');if(/^(xh|x-?heavy|extraheavy|xheavy)/.test(p))s+=4;else if(/^(h|heavy)/.test(p))s+=3;else if(/^(m|med|medium)/.test(p))s+=2;else if(/^(l|light)/.test(p))s+=1;else if(/^(xl|x-?light)/.test(p))s+=0.5;else{const n=parseFloat(p);if(!isNaN(n))s+=n/10}});return s}
+function bestSet(sets){let best=null;(sets||[]).forEach(s=>{const r=parseInt(s.reps)||0;if(!s.band&&!r)return;const sc=[bandScore(s.band),r];if(!best||sc[0]>best.sc[0]||(sc[0]===best.sc[0]&&sc[1]>best.sc[1]))best={s,sc}});return best&&best.s}
+const setText=s=>s?(esc(s.band||'?')+' × '+esc(s.reps||'?')):'';
+function lastFor(exId,exName){for(const s of sortedSessions()){const e=s.exercises.find(x=>x.exId===exId)||s.exercises.find(x=>x.name===exName);if(e&&e.sets.length)return {date:s.date,sets:e.sets}}return null}
+function lastDone(dayId){const s=sortedSessions().find(s=>s.dayId===dayId);return s&&s.date}
+
+// ---------- routing ----------
+let view={name:'home'};
+function go(name,arg){view={name,arg};render();window.scrollTo(0,0)}
+function header(title,back,right){$('#title').textContent=title;const b=$('#backBtn');b.style.display=back?'':'none';b.onclick=back||null;$('#hdrRight').innerHTML=right||''}
+function tabs(on){$('#bottom').innerHTML='<nav class="tabs">'+[['home','Workouts'],['history','History'],['settings','Settings']].map(([k,l])=>`<button data-a="tab" data-v="${k}" class="${on===k?'on':''}">${l}</button>`).join('')+'</nav>'}
+function render(){const v=view.name;if(v!=='workout')stopTimerUI();({home:renderHome,workout:renderWorkout,history:renderHistory,session:renderSession,settings:renderSettings,editday:renderEditDay,editex:renderEditEx}[v]||renderHome)(view.arg)}
+
+// ---------- home ----------
+function renderHome(){
+ header('Bands');tabs('home');
+ const wd=new Date().getDay();const todayDay=program.days.find(d=>d.weekday===wd);
+ let h='';
+ if(draft){const d=dayById(draft.dayId);h+=`<div class="card"><div class="row"><div class="grow"><b>In progress:</b> ${esc(d?d.name:draft.dayName)}<div class="dim small">Started ${esc(fmtDate(draft.date))}</div></div><button class="pri" data-a="resume">Resume</button></div></div>`}
+ h+=`<p class="dim small" style="margin:0 0 10px">${WD[wd]} · ${todayDay?'Today: '+esc(todayDay.name):'Rest day'}</p>`;
+ program.days.forEach(d=>{const ld=lastDone(d.id);const isT=todayDay&&todayDay.id===d.id;
+  h+=`<button class="card day${isT?' today':''}" data-a="start" data-v="${d.id}"><div class="t">${esc(d.name)} <span class="dim small">${esc(d.focus||'')}</span>${isT?'<span class="tag">TODAY</span>':''}</div><div class="dim small">${d.weekday!=null&&d.weekday!==''?WD[d.weekday]+' · ':''}${d.exercises.length} exercises · ${ld?'Last: '+esc(fmtDate(ld))+' ('+daysAgo(ld)+')':'Not done yet'}</div></button>`});
+ h+=`<p class="dim small">Rest: ${WD.filter((_,i)=>!program.days.some(d=>d.weekday===i)).join(', ')||'none'}. 2–3 sets each, to failure or within 2 reps of it.</p>`;
+ $('#app').innerHTML=h;
+}
+function startWorkout(dayId){
+ if(draft&&draft.dayId!==dayId){if(!confirm('Discard the workout in progress?'))return}
+ if(!draft||draft.dayId!==dayId){const d=dayById(dayId);
+  draft={dayId,dayName:d.name,date:localDate(),startedAt:Date.now(),exercises:d.exercises.map(e=>{const last=lastFor(e.id,e.name);const n=Math.max(3,last?Math.min(last.sets.length,6):3);return {exId:e.id,name:e.name,sets:Array.from({length:n},()=>({band:'',reps:'',note:'',done:false}))}})};saveDraft()}
+ go('workout');
+}
+
+// ---------- workout ----------
+function exInfo(dx){const d=dayById(draft.dayId);return (d&&d.exercises.find(e=>e.id===dx.exId))||{name:dx.name,cue:'',replaces:''}}
+function renderWorkout(){
+ if(!draft)return go('home');
+ header(draft.dayName,()=>go('home'),`<button class="ghost sm" data-a="discard">Discard</button>`);
+ let h=`<div class="row" style="margin-bottom:12px"><label class="dim small" for="wdate">Date</label><input id="wdate" type="date" value="${esc(draft.date)}" style="max-width:190px"></div>`;
+ draft.exercises.forEach((dx,i)=>{const e=exInfo(dx);const last=lastFor(dx.exId,dx.name);
+  h+=`<section class="card ex" data-ex="${i}"><h3>${i+1}. ${esc(e.name)}</h3><p class="cue">${esc(e.cue)}</p>${e.safety?`<div class="safety">${esc(e.safety)}</div>`:''}<div class="dim tiny">Replaces: ${esc(e.replaces||'—')}${last?' · Last '+esc(fmtDate(last.date))+': '+last.sets.map(setText).join(', '):''}</div>`;
+  dx.sets.forEach((s,j)=>{const ls=last?(last.sets[j]||last.sets[last.sets.length-1]):null;
+   h+=`<div class="setrow${s.done?' done':''}" data-set="${j}"><div class="n">${j+1}</div><input data-f="band" value="${esc(s.band)}" placeholder="${esc(ls?ls.band||'Band':'Band')}" autocomplete="off" autocapitalize="words"><input data-f="reps" value="${esc(s.reps)}" placeholder="${esc(ls&&ls.reps?ls.reps:'Reps')}" inputmode="numeric" pattern="[0-9]*"><button class="chk${s.done?' on':''}" data-a="done" aria-label="Done">✓</button></div>
+   <div class="chips" data-set="${j}">${BANDS.map(b=>`<button class="chip" data-a="band" data-v="${b}">${b}</button>`).join('')}<button class="chip" data-a="plus">+</button></div>
+   <input class="note" data-set="${j}" data-f="note" value="${esc(s.note)}" placeholder="${esc(ls&&ls.note?ls.note:'Note')}">`});
+  h+=`<div class="row" style="margin-top:10px"><button class="sm" data-a="addset">+ Set</button><button class="sm" data-a="delset"${dx.sets.length<2?' disabled':''}>− Set</button>${last?'<button class="sm" data-a="copylast">Fill from last</button>':''}</div></section>`});
+ h+=`<button class="pri full" data-a="finish" style="min-height:56px;margin:6px 0 20px">Finish workout</button>`;
+ $('#app').innerHTML=h;
+ $('#bottom').innerHTML=`<div class="timer" id="timer"><span class="clock" id="clock">Rest</span><button data-a="rest" data-v="60">60s</button><button data-a="rest" data-v="90">90s</button><button data-a="rest" data-v="120">120s</button><button class="ghost" data-a="reststop" style="flex:0 0 auto">✕</button></div>`;
+ updateTimer();if(timer.end)timer.iv=timer.iv||setInterval(updateTimer,250);
+}
+function rowCtx(el){const ex=el.closest('[data-ex]');const st=el.closest('[data-set]');return ex&&st?{dx:draft.exercises[+ex.dataset.ex],j:+st.dataset.set,exEl:ex}:null}
+function finishWorkout(){
+ const ex=draft.exercises.map(dx=>({exId:dx.exId,name:exInfo(dx).name,sets:dx.sets.filter(s=>s.band.trim()||String(s.reps).trim()).map(s=>({band:s.band.trim(),reps:String(s.reps).trim(),note:s.note.trim(),done:!!s.done}))})).filter(e=>e.sets.length);
+ if(!ex.length){if(!confirm('No sets entered. Save anyway?'))return}
+ const s={id:uid(),dayId:draft.dayId,dayName:draft.dayName,date:draft.date||localDate(),savedAt:new Date().toISOString(),durationMin:Math.round((Date.now()-draft.startedAt)/60000),exercises:ex};
+ sessions.push(s);saveSessions();draft=null;saveDraft();resetTimer();toast('Saved');go('session',s.id);
+}
+
+// ---------- rest timer ----------
+const timer={end:0,iv:null,beeped:false};
+function startRest(sec){timer.end=Date.now()+sec*1000;timer.beeped=false;clearInterval(timer.iv);timer.iv=setInterval(updateTimer,250);updateTimer();unlockAudio()}
+function resetTimer(){timer.end=0;clearInterval(timer.iv);timer.iv=null;updateTimer()}
+function stopTimerUI(){clearInterval(timer.iv);timer.iv=null}
+function updateTimer(){const c=$('#clock'),t=$('#timer');if(!c)return;if(!timer.end){c.textContent='Rest';t.className='timer';return}
+ const left=Math.ceil((timer.end-Date.now())/1000);
+ if(left>0){c.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');t.className='timer run'}
+ else{c.textContent='Go';t.className='timer end';if(!timer.beeped){timer.beeped=true;beep();if(navigator.vibrate)navigator.vibrate([200,100,200])}clearInterval(timer.iv);timer.iv=null}}
+let actx=null;
+function unlockAudio(){try{if(!actx){const A=window.AudioContext||window.webkitAudioContext;if(A)actx=new A()}if(actx&&actx.state==='suspended')actx.resume()}catch(e){}}
+function beep(){try{if(!actx)return;[0,.3].forEach(t=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.25,actx.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+t+.25);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+.26)})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view.name==='workout'&&timer.end){updateTimer();if(Date.now()<timer.end&&!timer.iv)timer.iv=setInterval(updateTimer,250)}});
+
+// ---------- history ----------
+let histTab='sessions';
+function renderHistory(){
+ header('History');tabs('history');
+ let h=`<div class="seg"><button data-a="htab" data-v="sessions" class="${histTab==='sessions'?'on':''}">Sessions</button><button data-a="htab" data-v="progress" class="${histTab==='progress'?'on':''}">Progress</button></div>`;
+ const ss=sortedSessions();
+ if(!ss.length)h+='<p class="dim">No sessions yet.</p>';
+ else if(histTab==='sessions'){h+='<div class="list">'+ss.map(s=>{const n=s.exercises.reduce((a,e)=>a+e.sets.length,0);return `<button class="card" data-a="open" data-v="${s.id}"><b>${esc(fmtDate(s.date))}</b> · ${esc(s.dayName)}<div class="dim small">${s.exercises.length} exercises · ${n} sets${s.durationMin?' · '+s.durationMin+' min':''}</div></button>`}).join('')+'</div>'}
+ else{
+  h+='<p class="dim small" style="margin-top:0">Best set from each of the last 5 sessions, newest first.</p>';
+  const seen=new Set();
+  const block=(title,list)=>{let b='';list.forEach(({id,name})=>{const rows=[];for(const s of ss){const e=s.exercises.find(x=>x.exId===id)||(id?null:s.exercises.find(x=>x.name===name));if(e){const bs=bestSet(e.sets);if(bs)rows.push({date:s.date,bs})}if(rows.length>=5)break}
+    if(rows.length)b+=`<div class="card"><b>${esc(name)}</b><div class="prog">${rows.map((r,i)=>`<span>${esc(fmtDate(r.date).replace(/^\w+ /,''))}: ${i===0?'<b>'+setText(r.bs)+'</b>':setText(r.bs)}</span>`).join('')}</div></div>`});return b?`<h2>${esc(title)}</h2>`+b:''};
+  program.days.forEach(d=>{d.exercises.forEach(e=>seen.add(e.id));h+=block(d.name,d.exercises.map(e=>({id:e.id,name:e.name})))});
+  const old=[];const on=new Set();ss.forEach(s=>s.exercises.forEach(e=>{if(!seen.has(e.exId)&&!on.has(e.exId)){on.add(e.exId);old.push({id:e.exId,name:e.name})}}));
+  if(old.length)h+=block('Removed exercises',old);
+ }
+ $('#app').innerHTML=h;
+}
+function renderSession(id){
+ const s=sessions.find(x=>x.id===id);if(!s)return go('history');
+ header(s.dayName,()=>go('history'));tabs('history');
+ let h=`<p class="dim" style="margin-top:0">${esc(fmtDate(s.date))}${s.durationMin?' · '+s.durationMin+' min':''}</p>`;
+ if(!s.exercises.length)h+='<p class="dim">No sets logged.</p>';
+ s.exercises.forEach(e=>{h+=`<div class="card"><b>${esc(e.name)}</b><table><tr><th>#</th><th>Band</th><th>Reps</th><th>Note</th></tr>${e.sets.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.band)}</td><td>${esc(x.reps)}</td><td class="dim">${esc(x.note)}</td></tr>`).join('')}</table></div>`});
+ h+=`<button class="danger full" data-a="delsession" data-v="${s.id}">Delete session</button>`;
+ $('#app').innerHTML=h;
+}
+
+// ---------- settings ----------
+function renderSettings(){
+ header('Settings');tabs('settings');
+ let h='<h2>Program</h2><div class="list">'+program.days.map(d=>`<button class="card" data-a="editday" data-v="${d.id}"><b>${esc(d.name)}</b> <span class="dim">${esc(d.focus||'')}</span><div class="dim small">${d.weekday!=null&&d.weekday!==''?WD[d.weekday]+' · ':''}${d.exercises.length} exercises</div></button>`).join('')+'</div>';
+ h+=`<button class="full" data-a="restoreprog">Restore default program</button>
+ <h2>Data</h2><p class="dim small" style="margin-top:0">${sessions.length} sessions saved on this device.</p>
+ <div class="row"><button class="grow" data-a="export">Export JSON</button><button class="grow" data-a="copyjson">Copy JSON</button></div>
+ <label class="f" for="impfile">Import from file</label><input type="file" id="impfile" accept=".json,application/json,text/plain">
+ <label class="f" for="imptext">Or paste JSON</label><textarea id="imptext" rows="3"></textarea>
+ <button class="full" data-a="importtext" style="margin-top:8px">Import pasted JSON</button>
+ <h2>Reset</h2><button class="danger full" data-a="reset">Erase all data</button>`;
+ $('#app').innerHTML=h;
+ $('#impfile').onchange=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>doImport(r.result);r.readAsText(f)};
+}
+function exportData(){return JSON.stringify({app:'band-tracker',version:1,exportedAt:new Date().toISOString(),program,sessions,draft},null,1)}
+function doImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return alert('Not valid JSON.')}
+ if(!o||!Array.isArray(o.sessions)||!o.program||!Array.isArray(o.program.days))return alert('This file does not look like a Bands export.');
+ if(!confirm(`Replace current data with ${o.sessions.length} sessions from this file?`))return;
+ program=o.program;sessions=o.sessions;draft=o.draft||null;saveProgram();saveSessions();saveDraft();toast('Imported');go('settings')}
+function renderEditDay(id){
+ const d=dayById(id);if(!d)return go('settings');
+ header('Edit '+d.name,()=>go('settings'));tabs('settings');
+ let h=`<label class="f">Name</label><input data-dayf="name" value="${esc(d.name)}"><label class="f">Focus</label><input data-dayf="focus" value="${esc(d.focus||'')}">
+ <label class="f">Suggested day</label><select data-dayf="weekday"><option value="">None</option>${WD.map((w,i)=>`<option value="${i}"${d.weekday===i?' selected':''}>${w}</option>`).join('')}</select><h2>Exercises</h2>`;
+ d.exercises.forEach((e,i)=>{h+=`<div class="card"><b>${i+1}. ${esc(e.name)}</b><div class="dim small">${esc(e.cue)}</div><div class="row" style="margin-top:8px"><button class="sm" data-a="editex" data-v="${i}">Edit</button><button class="sm" data-a="exup" data-v="${i}"${i===0?' disabled':''}>↑</button><button class="sm" data-a="exdown" data-v="${i}"${i===d.exercises.length-1?' disabled':''}>↓</button><button class="sm danger" data-a="exdel" data-v="${i}">Remove</button></div></div>`});
+ h+=`<button class="pri full" data-a="exadd">+ Add exercise</button>`;
+ $('#app').innerHTML=h;
+ document.querySelectorAll('[data-dayf]').forEach(el=>el.onchange=()=>{const f=el.dataset.dayf;d[f]=f==='weekday'?(el.value===''?null:+el.value):el.value.trim()||d[f];saveProgram()});
+}
+function renderEditEx(arg){
+ const d=dayById(arg.day);const isNew=arg.i==null;const e=isNew?{name:'',cue:'',replaces:'',safety:''}:d.exercises[arg.i];
+ header(isNew?'Add exercise':'Edit exercise',()=>go('editday',d.id));tabs('settings');
+ $('#app').innerHTML=`<label class="f">Name</label><input id="exname" value="${esc(e.name)}"><label class="f">Setup cue</label><textarea id="excue" rows="2">${esc(e.cue)}</textarea><label class="f">Replaces (gym move)</label><input id="exrep" value="${esc(e.replaces||'')}"><label class="f">Safety note (optional)</label><textarea id="exsafe" rows="2">${esc(e.safety||'')}</textarea><button class="pri full" data-a="exsave" style="margin-top:14px">Save</button>`;
+}
+
+// ---------- events ----------
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,v=b.dataset.v;
+ switch(a){
+ case 'tab':go(v);break;
+ case 'start':startWorkout(v);break;
+ case 'resume':go('workout');break;
+ case 'discard':if(confirm('Discard this workout?')){draft=null;saveDraft();resetTimer();go('home')}break;
+ case 'done':case 'band':case 'plus':{const c=rowCtx(b);if(!c)return;const s=c.dx.sets[c.j];
+  if(a==='done'){s.done=!s.done;b.classList.toggle('on',s.done);b.closest('.setrow').classList.toggle('done',s.done)}
+  else{const inp=c.exEl.querySelector(`.setrow[data-set="${c.j}"] [data-f="band"]`);
+   if(a==='plus'){if(s.band&&!/\+$/.test(s.band))s.band+='+'}else s.band=/\+$/.test(s.band)?s.band+v:v;inp.value=s.band}
+  saveDraft();break}
+ case 'addset':case 'delset':case 'copylast':{const i=+b.closest('[data-ex]').dataset.ex;const dx=draft.exercises[i];
+  if(a==='addset'){const p=dx.sets[dx.sets.length-1];dx.sets.push({band:p?p.band:'',reps:'',note:'',done:false})}
+  else if(a==='delset'){if(dx.sets.length>1)dx.sets.pop()}
+  else{const last=lastFor(dx.exId,dx.name);if(last){last.sets.forEach((ls,j)=>{if(!dx.sets[j])dx.sets.push({band:'',reps:'',note:'',done:false});if(!dx.sets[j].band)dx.sets[j].band=ls.band||''})}}
+  saveDraft();const y=window.scrollY;renderWorkout();window.scrollTo(0,y);break}
+ case 'rest':startRest(+v);break;
+ case 'reststop':resetTimer();break;
+ case 'finish':finishWorkout();break;
+ case 'htab':histTab=v;renderHistory();break;
+ case 'open':go('session',v);break;
+ case 'delsession':if(confirm('Delete this session?')){sessions=sessions.filter(s=>s.id!==v);saveSessions();go('history')}break;
+ case 'editday':go('editday',v);break;
+ case 'restoreprog':if(confirm('Restore the default 4-day program? Your edits will be lost. History is kept.')){program=clone(DEFAULT_PROGRAM);saveProgram();toast('Restored');go('settings')}break;
+ case 'export':{const blob=new Blob([exportData()],{type:'application/json'});const u=URL.createObjectURL(blob);const l=document.createElement('a');l.href=u;l.download='bands-'+localDate()+'.json';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
+ case 'copyjson':{const t=exportData();(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copied')).catch(()=>{const ta=$('#imptext');ta.value=t;ta.select();toast('Select all and copy from the box')});break}
+ case 'importtext':doImport($('#imptext').value);break;
+ case 'reset':if(confirm('Erase all workouts, edits and settings on this device?')&&confirm('This cannot be undone. Erase?')){localStorage.removeItem(K.prog);localStorage.removeItem(K.sess);localStorage.removeItem(K.draft);program=clone(DEFAULT_PROGRAM);sessions=[];draft=null;toast('Erased');go('home')}break;
+ case 'editex':go('editex',{day:view.arg,i:+v});break;
+ case 'exadd':go('editex',{day:view.arg,i:null});break;
+ case 'exup':case 'exdown':{const d=dayById(view.arg),i=+v,j=a==='exup'?i-1:i+1;[d.exercises[i],d.exercises[j]]=[d.exercises[j],d.exercises[i]];saveProgram();renderEditDay(d.id);break}
+ case 'exdel':{const d=dayById(view.arg);if(confirm('Remove '+d.exercises[+v].name+'? Its history is kept.')){d.exercises.splice(+v,1);saveProgram();renderEditDay(d.id)}break}
+ case 'exsave':{const d=dayById(view.arg.day);const name=$('#exname').value.trim();if(!name)return alert('Name is required.');
+  const vals={name,cue:$('#excue').value.trim(),replaces:$('#exrep').value.trim(),safety:$('#exsafe').value.trim()};
+  if(view.arg.i==null)d.exercises.push(Object.assign({id:'x'+uid()},vals));else Object.assign(d.exercises[view.arg.i],vals);
+  if(!vals.safety){const e=view.arg.i==null?d.exercises[d.exercises.length-1]:d.exercises[view.arg.i];delete e.safety}
+  saveProgram();go('editday',d.id);break}
+ }
+});
+document.addEventListener('input',ev=>{
+ const el=ev.target;
+ if(el.id==='wdate'&&draft){draft.date=el.value||localDate();saveDraft();return}
+ if(!el.dataset.f||view.name!=='workout')return;const c=rowCtx(el);if(!c)return;
+ c.dx.sets[c.j][el.dataset.f]=el.dataset.f==='reps'?el.value.replace(/[^0-9]/g,''):el.value;
+ if(el.dataset.f==='reps'&&el.value!==c.dx.sets[c.j].reps)el.value=c.dx.sets[c.j].reps;
+ saveDraft();
+});
+
+// ---------- home screen icon (iOS needs PNG) ----------
+(function(){try{const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#14171c';x.fillRect(0,0,180,180);x.strokeStyle='#f0a030';x.lineWidth=14;x.beginPath();x.moveTo(40,90);x.quadraticCurveTo(90,40,140,90);x.quadraticCurveTo(90,140,40,90);x.stroke();x.fillStyle='#3fb7a3';[40,140].forEach(cx=>{x.beginPath();x.arc(cx,90,14,0,7);x.fill()});document.getElementById('touchIcon').href=c.toDataURL('image/png')}catch(e){}})();
+
+render();
+</script>
+</body>
+</html>
