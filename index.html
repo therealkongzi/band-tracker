@@ -72,51 +72,115 @@ h2{font-size:17px;margin:18px 0 8px;color:var(--dim);font-weight:600;text-transf
 <script>
 'use strict';
 const BACK='Back: brace your core, keep a neutral spine, and stop if pain is sharp or runs down the leg.';
-const DEFAULT_PROGRAM={days:[
- {id:'torsoA',name:'Torso A',focus:'Push',weekday:1,exercises:[
+const HINGE_WARMUP_SAFETY=BACK+' A little next-day stiffness is fine; sharper right-sided pain the next morning means cut the range or skip that day\'s hinges.';
+const HIP_THRUST_CUE='Band across hips, held down by hands or anchored; drive hips up, pause 2 seconds at the top, and squeeze the glutes hard as if pinching a coin. Ribs down; do not arch the low back.';
+const HIP_THRUST_SAFETY='Back: lift with the glutes, pause 2 seconds and squeeze hard at the top (as if pinching a coin), ribs down, do not arch the low back.';
+const PROGRAM_VERSION=2;
+const WARMUP_PREFIX={torsoA:'ta',limbsA:'la',torsoB:'tb',limbsB:'lb'};
+const GLUTE_CUE='Lie on your back with knees bent, or stand tall, and pinch the glutes hard without arching the low back. The right side should feel like it is working, not just the left taking over.';
+const SIDE_CUE='2 holds of 20–30 seconds. Stand tall, reach the left arm up and over to the left until there is a mild stretch along the right waist. It should feel like a stretch, not a burn.';
+const HINGE_CUE='3 sets of 8–12. Go light. Stand on the middle of the band and hold the ends. Soften the knees, push the hips back, and keep the ribs stacked over the pelvis so the back stays long (not rounded, not overly arched). Feel it in the hamstrings and glutes; stand up by driving the floor away and squeezing both glutes at the top. If the right low back starts to do the lifting, shorten the hinge and think "hips back," not "bend down."';
+function gluteSqueeze(prefix,sets){
+ return {id:prefix+'w1',name:'Warmup: glute squeezes',cue:(sets===1?'1 set':'2 sets')+' of 8–10 holds of about 5 seconds. '+GLUTE_CUE,replaces:'',defaultSets:sets};
+}
+function sideBend(prefix,id){
+ return {id:id||prefix+'w3',name:'Warmup: standing side bend',cue:SIDE_CUE,replaces:'',defaultSets:2};
+}
+function lightHinge(prefix){
+ return {id:prefix+'w2',name:'Warmup: light band hinge',cue:HINGE_CUE,replaces:'',safety:HINGE_WARMUP_SAFETY,defaultSets:3};
+}
+function mondayWarmup(){return [gluteSqueeze('ta',1),sideBend('ta','taw2')]}
+function warmupTrio(prefix){return [gluteSqueeze(prefix,2),lightHinge(prefix),sideBend(prefix)]}
+function warmupsFor(dayId){
+ const prefix=WARMUP_PREFIX[dayId];
+ if(!prefix)return [];
+ return dayId==='torsoA'?mondayWarmup():warmupTrio(prefix);
+}
+const DEFAULT_PROGRAM={version:PROGRAM_VERSION,days:[
+ {id:'torsoA',name:'Torso A',focus:'Push',weekday:1,exercises:mondayWarmup().concat([
   {id:'ta1',name:'Band incline chest press',cue:'Anchor low behind you; press up and forward at about 30°.',replaces:'Smith incline bench'},
   {id:'ta2',name:'Band lat pulldown',cue:'Anchor high, kneel facing it; pull elbows down to your ribs.',replaces:'Lat pulldown'},
   {id:'ta3',name:'Band-resisted push-up',cue:'Band across upper back, ends pinned under your hands.',replaces:'Dips'},
   {id:'ta4',name:'Band wide-grip seated row',cue:'Anchor at chest height or band around feet; pull with elbows flared.',replaces:'Wide cable row'},
   {id:'ta5',name:'Band chest fly',cue:'Anchor mid-height behind you; hug-a-tree arc, slight elbow bend.',replaces:'Pec deck'},
-  {id:'ta6',name:'Band lateral raise',cue:'Stand on band; raise arms out to shoulder height.',replaces:'Lateral raises'}]},
- {id:'limbsA',name:'Limbs A',focus:'Legs',weekday:2,exercises:[
+  {id:'ta6',name:'Band lateral raise',cue:'Stand on band; raise arms out to shoulder height.',replaces:'Lateral raises'}])},
+ {id:'limbsA',name:'Limbs A',focus:'Legs',weekday:2,exercises:warmupTrio('la').concat([
   {id:'la1',name:'Band seated calf raise',cue:'Seated, band looped around ball of foot; point toes into it.',replaces:'Seated calf raise'},
   {id:'la2',name:'Band leg extension',cue:'Anchor low behind chair, band around ankle; straighten the knee.',replaces:'Leg extension'},
   {id:'la3',name:'Band front squat',cue:'Stand on band, handles at shoulders; sit straight down, chest up.',replaces:'Hack squat'},
-  {id:'la4',name:'Band hip thrust / glute bridge',cue:'Band across hips, held down by hands or anchored; drive hips up, squeeze glutes.',replaces:'Hip thrust',safety:'Back: lift with the glutes, ribs down, do not arch the low back at the top.'},
+  {id:'la4',name:'Band hip thrust / glute bridge',cue:HIP_THRUST_CUE,replaces:'Hip thrust',safety:HIP_THRUST_SAFETY},
   {id:'la5',name:'Band single-arm tricep pushdown',cue:'Anchor high; elbow pinned at side, push down to straight arm.',replaces:'Single-arm pushdown'},
-  {id:'la6',name:'Band biceps curl',cue:'Stand on band; elbows at sides, curl up.',replaces:'DB curl'}]},
- {id:'torsoB',name:'Torso B',focus:'Pull',weekday:4,exercises:[
+  {id:'la6',name:'Band biceps curl',cue:'Stand on band; elbows at sides, curl up.',replaces:'DB curl'}])},
+ {id:'torsoB',name:'Torso B',focus:'Pull',weekday:4,exercises:warmupTrio('tb').concat([
   {id:'tb1',name:'Band bent-over row',cue:'Stand on band, flat back; hinge only as far as comfortable, row to belly.',replaces:'Barbell row',safety:BACK},
   {id:'tb2',name:'Band overhead press',cue:'Stand on band; press handles straight overhead.',replaces:'Shoulder press'},
   {id:'tb3',name:'Band single-arm row',cue:'Anchor mid-height or stand on band; row one arm, elbow to hip.',replaces:'DB row'},
   {id:'tb4',name:'Band chest press',cue:'Anchor mid-height behind you, standing; press straight forward.',replaces:'DB bench'},
   {id:'tb5',name:'Band upright row',cue:'Stand on band; elbows up to shoulder height. Stop if shoulders pinch.',replaces:'Upright row'},
-  {id:'tb6',name:'Band deadlift',cue:'Stand on band; hips back, neutral spine, stand tall. Go light while back is sore.',replaces:'Rack pull',safety:BACK}]},
- {id:'limbsB',name:'Limbs B',focus:'Arms',weekday:5,exercises:[
+  {id:'tb6',name:'Band deadlift',cue:'Stand on band; hips back, neutral spine, stand tall. Go light while back is sore.',replaces:'Rack pull',safety:BACK}])},
+ {id:'limbsB',name:'Limbs B',focus:'Arms',weekday:5,exercises:warmupTrio('lb').concat([
   {id:'lb1',name:'Band standing calf raise',cue:'Stand on band, handles at sides; rise high on toes.',replaces:'Standing calf raise'},
   {id:'lb2',name:'Band close-grip chest press',cue:'Anchor behind; hands close, elbows tucked.',replaces:'Close-grip bench'},
   {id:'lb3',name:'Band drag curl',cue:'Stand on band; drag hands up your body, elbows back.',replaces:'Drag curl'},
   {id:'lb4',name:'Band overhead tricep extension',cue:'Stand on band or anchor low, face away; extend arms overhead.',replaces:'Overhead cable extension'},
   {id:'lb5',name:'Band single-arm concentration curl',cue:'Seated, stand on band, elbow braced on inner thigh; curl.',replaces:'Single-arm preacher curl'},
   {id:'lb6',name:'Band split squat',cue:'Front foot on band; rear foot elevated if comfortable. Drop straight down.',replaces:'Bulgarian split squat'},
-  {id:'lb7',name:'Band Romanian deadlift',cue:'Stand on band, soft knees; push hips back, neutral spine. Light while back is sore.',replaces:'RDL',safety:BACK}]}
+  {id:'lb7',name:'Band Romanian deadlift',cue:'Stand on band, soft knees; push hips back, neutral spine. Light while back is sore.',replaces:'RDL',safety:BACK}])}
 ]};
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const BANDS=['Light','Med','Heavy','X-Heavy'];
 const K={prog:'bt_program',sess:'bt_sessions',draft:'bt_draft'};
 
 // ---------- storage ----------
+// v2 prepends warmups (short on Monday, full on Tue/Thu/Fri) and refreshes the hip-thrust cue.
+// Session logs in bt_sessions are never rewritten.
 function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Could not save: storage full or blocked')}}
 const clone=o=>JSON.parse(JSON.stringify(o));
-let program=load(K.prog,null)||clone(DEFAULT_PROGRAM);
+const normName=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+function blankSets(n){return Array.from({length:n},()=>({band:'',reps:'',note:'',done:false}))}
+function prependMissing(list,warmups){
+ const add=warmups.filter(w=>!(list||[]).some(e=>e.id===w.id||normName(e.name)===normName(w.name)));
+ return add.concat(list||[]);
+}
+function migrateProgram(prog){
+ const p=clone(prog);
+ (p.days||[]).forEach(day=>{
+  if(!day||!Array.isArray(day.exercises))return;
+  const warmups=warmupsFor(day.id);
+  if(warmups.length)day.exercises=prependMissing(day.exercises,warmups);
+  day.exercises.forEach(e=>{if(e.id==='la4'){e.cue=HIP_THRUST_CUE;e.safety=HIP_THRUST_SAFETY}});
+ });
+ p.version=PROGRAM_VERSION;
+ return p;
+}
+function programFromSaved(saved){
+ if(!saved||!Array.isArray(saved.days))return clone(DEFAULT_PROGRAM);
+ return (Number(saved.version)||1)<PROGRAM_VERSION?migrateProgram(saved):saved;
+}
+function syncDraftWarmups(){
+ if(!draft||!Array.isArray(draft.exercises))return false;
+ const warmups=warmupsFor(draft.dayId);
+ if(!warmups.length)return false;
+ const day=(program.days||[]).find(d=>d.id===draft.dayId);
+ if(!day||!Array.isArray(day.exercises))return false;
+ const onDay=new Set(day.exercises.map(e=>e.id));
+ const haveId=new Set(draft.exercises.map(e=>e.exId));
+ const haveName=new Set(draft.exercises.map(e=>normName(e.name)));
+ const add=warmups.filter(w=>onDay.has(w.id)&&!haveId.has(w.id)&&!haveName.has(normName(w.name)));
+ if(!add.length)return false;
+ draft.exercises=add.map(e=>({exId:e.id,name:e.name,sets:blankSets(e.defaultSets||3)})).concat(draft.exercises);
+ return true;
+}
+const savedProgram=load(K.prog,null);
+let program=savedProgram?programFromSaved(savedProgram):clone(DEFAULT_PROGRAM);
 let sessions=load(K.sess,[]);
 let draft=load(K.draft,null);
 const saveProgram=()=>save(K.prog,program);
 const saveSessions=()=>save(K.sess,sessions);
 const saveDraft=()=>draft?save(K.draft,draft):localStorage.removeItem(K.draft);
+if(savedProgram&&program!==savedProgram)saveProgram();
+if(syncDraftWarmups())saveDraft();
 
 // ---------- helpers ----------
 const $=s=>document.querySelector(s);
@@ -131,7 +195,7 @@ const sortedSessions=()=>sessions.slice().sort((a,b)=>(b.date+b.savedAt).localeC
 function bandScore(b){if(!b)return 0;let s=0;String(b).toLowerCase().split(/[+&,\/]| and /).forEach(p=>{p=p.trim().replace(/\s+/g,'');if(/^(xh|x-?heavy|extraheavy|xheavy)/.test(p))s+=4;else if(/^(h|heavy)/.test(p))s+=3;else if(/^(m|med|medium)/.test(p))s+=2;else if(/^(l|light)/.test(p))s+=1;else if(/^(xl|x-?light)/.test(p))s+=0.5;else{const n=parseFloat(p);if(!isNaN(n))s+=n/10}});return s}
 function bestSet(sets){let best=null;(sets||[]).forEach(s=>{const r=parseInt(s.reps)||0;if(!s.band&&!r)return;const sc=[bandScore(s.band),r];if(!best||sc[0]>best.sc[0]||(sc[0]===best.sc[0]&&sc[1]>best.sc[1]))best={s,sc}});return best&&best.s}
 const setText=s=>s?(esc(s.band||'?')+' × '+esc(s.reps||'?')):'';
-function lastFor(exId,exName){for(const s of sortedSessions()){const e=s.exercises.find(x=>x.exId===exId)||s.exercises.find(x=>x.name===exName);if(e&&e.sets.length)return {date:s.date,sets:e.sets}}return null}
+function lastFor(exId,exName){for(const s of sortedSessions()){const e=s.exercises.find(x=>exId&&x.exId===exId)||s.exercises.find(x=>!x.exId&&x.name===exName);if(e&&e.sets.length)return {date:s.date,sets:e.sets}}return null}
 function lastDone(dayId){const s=sortedSessions().find(s=>s.dayId===dayId);return s&&s.date}
 
 // ---------- routing ----------
@@ -150,13 +214,13 @@ function renderHome(){
  h+=`<p class="dim small" style="margin:0 0 10px">${WD[wd]} · ${todayDay?'Today: '+esc(todayDay.name):'Rest day'}</p>`;
  program.days.forEach(d=>{const ld=lastDone(d.id);const isT=todayDay&&todayDay.id===d.id;
   h+=`<button class="card day${isT?' today':''}" data-a="start" data-v="${d.id}"><div class="t">${esc(d.name)} <span class="dim small">${esc(d.focus||'')}</span>${isT?'<span class="tag">TODAY</span>':''}</div><div class="dim small">${d.weekday!=null&&d.weekday!==''?WD[d.weekday]+' · ':''}${d.exercises.length} exercises · ${ld?'Last: '+esc(fmtDate(ld))+' ('+daysAgo(ld)+')':'Not done yet'}</div></button>`});
- h+=`<p class="dim small">Rest: ${WD.filter((_,i)=>!program.days.some(d=>d.weekday===i)).join(', ')||'none'}. 2–3 sets each, to failure or within 2 reps of it.</p>`;
+ h+=`<p class="dim small">Rest: ${WD.filter((_,i)=>!program.days.some(d=>d.weekday===i)).join(', ')||'none'}. Working exercises: 2–3 sets, to failure or within 2 reps of it. Warmups stay light.</p>`;
  $('#app').innerHTML=h;
 }
 function startWorkout(dayId){
  if(draft&&draft.dayId!==dayId){if(!confirm('Discard the workout in progress?'))return}
  if(!draft||draft.dayId!==dayId){const d=dayById(dayId);
-  draft={dayId,dayName:d.name,date:localDate(),startedAt:Date.now(),exercises:d.exercises.map(e=>{const last=lastFor(e.id,e.name);const n=Math.max(3,last?Math.min(last.sets.length,6):3);return {exId:e.id,name:e.name,sets:Array.from({length:n},()=>({band:'',reps:'',note:'',done:false}))}})};saveDraft()}
+  draft={dayId,dayName:d.name,date:localDate(),startedAt:Date.now(),exercises:d.exercises.map(e=>{const last=lastFor(e.id,e.name);const preset=e.defaultSets||3;const n=last?Math.min(6,Math.max(preset,last.sets.length)):preset;return {exId:e.id,name:e.name,sets:blankSets(n)}})};saveDraft()}
  go('workout');
 }
 
@@ -167,7 +231,8 @@ function renderWorkout(){
  header(draft.dayName,()=>go('home'),`<button class="ghost sm" data-a="discard">Discard</button>`);
  let h=`<div class="row" style="margin-bottom:12px"><label class="dim small" for="wdate">Date</label><input id="wdate" type="date" value="${esc(draft.date)}" style="max-width:190px"></div>`;
  draft.exercises.forEach((dx,i)=>{const e=exInfo(dx);const last=lastFor(dx.exId,dx.name);
-  h+=`<section class="card ex" data-ex="${i}"><h3>${i+1}. ${esc(e.name)}</h3><p class="cue">${esc(e.cue)}</p>${e.safety?`<div class="safety">${esc(e.safety)}</div>`:''}<div class="dim tiny">Replaces: ${esc(e.replaces||'—')}${last?' · Last '+esc(fmtDate(last.date))+': '+last.sets.map(setText).join(', '):''}</div>`;
+  const meta=[];if(e.replaces)meta.push('Replaces: '+esc(e.replaces));if(last)meta.push('Last '+esc(fmtDate(last.date))+': '+last.sets.map(setText).join(', '));
+  h+=`<section class="card ex" data-ex="${i}"><h3>${i+1}. ${esc(e.name)}</h3><p class="cue">${esc(e.cue)}</p>${e.safety?`<div class="safety">${esc(e.safety)}</div>`:''}${meta.length?`<div class="dim tiny">${meta.join(' · ')}</div>`:''}`;
   dx.sets.forEach((s,j)=>{const ls=last?(last.sets[j]||last.sets[last.sets.length-1]):null;
    h+=`<div class="setrow${s.done?' done':''}" data-set="${j}"><div class="n">${j+1}</div><input data-f="band" value="${esc(s.band)}" placeholder="${esc(ls?ls.band||'Band':'Band')}" autocomplete="off" autocapitalize="words"><input data-f="reps" value="${esc(s.reps)}" placeholder="${esc(ls&&ls.reps?ls.reps:'Reps')}" inputmode="numeric" pattern="[0-9]*"><button class="chk${s.done?' on':''}" data-a="done" aria-label="Done">✓</button></div>
    <div class="chips" data-set="${j}">${BANDS.map(b=>`<button class="chip" data-a="band" data-v="${b}">${b}</button>`).join('')}<button class="chip" data-a="plus">+</button></div>
@@ -247,7 +312,7 @@ function exportData(){return JSON.stringify({app:'band-tracker',version:1,export
 function doImport(txt){let o;try{o=JSON.parse(txt)}catch(e){return alert('Not valid JSON.')}
  if(!o||!Array.isArray(o.sessions)||!o.program||!Array.isArray(o.program.days))return alert('This file does not look like a Bands export.');
  if(!confirm(`Replace current data with ${o.sessions.length} sessions from this file?`))return;
- program=o.program;sessions=o.sessions;draft=o.draft||null;saveProgram();saveSessions();saveDraft();toast('Imported');go('settings')}
+ program=programFromSaved(o.program);sessions=o.sessions;draft=o.draft||null;syncDraftWarmups();saveProgram();saveSessions();saveDraft();toast('Imported');go('settings')}
 function renderEditDay(id){
  const d=dayById(id);if(!d)return go('settings');
  header('Edit '+d.name,()=>go('settings'));tabs('settings');
